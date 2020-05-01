@@ -14,10 +14,12 @@ MAX_THREAD = 4
 # progress bar
 current_state = 0
 max_state = 0
+stale = 0
 
 
 def download(filename, url, sherif):
     global current_state
+    global stale
 
     # filename UNIX style
     isbn = url.split('=')[-1].replace('-', '')
@@ -32,19 +34,24 @@ def download(filename, url, sherif):
         # Download the PDF
         pdf = requests.get(download_url, stream=True)
 
-        # Create the new file and put the content in
-        new_book = open(file_path, "wb")
-        new_book.write(pdf.content)
-        new_book.close()
+        if pdf.headers['content-type'] in ['application/pdf']:
+            # Create the new file and put the content in
+            new_book = open(file_path, "wb")
+            new_book.write(pdf.content)
+            new_book.close()
 
-        # Locking the thread because...
-        # yeah we like concurrent programming
-        with sherif:
-            # this shows progress
+            # Locking the thread because...
+            # yeah we like concurrent programming
+            with sherif:
+                # this shows progress
+                current_state += 1
+                sys.stdout.write('\r')
+                sys.stdout.write(f'{"PDF {}/{}, downloaded: {}": <64}'.format(current_state, max_state, filename))
+                sys.stdout.flush()
+        else:
+            stale += 1
             current_state += 1
-            sys.stdout.write('\r')
-            sys.stdout.write(f'{"PDF {}/{}, downloaded: {}": <64}'.format(current_state, max_state, filename))
-            sys.stdout.flush()
+
     else:
         with sherif:
             # this shows progress
@@ -73,6 +80,8 @@ def main():
             pipe = [executor.submit(download, book[0], book[1], sherif) for book in csv_reader]
             max_state = len(pipe) - 1
             cf.wait(pipe)
+
+    print('\nDownloaded {}, found {} stale link'.format(max_state - stale, stale))
 
 
 if __name__ == "__main__":
