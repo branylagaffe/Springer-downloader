@@ -66,7 +66,7 @@ def main():
         os.mkdir(SPRINGER_FOLDER)
 
     with open(SPRINGER_FILE) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=';')
+        csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader, None)
 
         with cf.ThreadPoolExecutor(max_workers=MAX_THREAD) as executor:
