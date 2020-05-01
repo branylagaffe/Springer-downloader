@@ -43,14 +43,14 @@ def download(filename, url, sherif):
             # this shows progress
             current_state += 1
             sys.stdout.write('\r')
-            sys.stdout.write('PDF {}/{}, downloaded: {}'.format(current_state, max_state, filename))
+            sys.stdout.write(f'{"PDF {}/{}, downloaded: {}": <64}'.format(current_state, max_state, filename))
             sys.stdout.flush()
     else:
         with sherif:
             # this shows progress
             current_state += 1
             sys.stdout.write('\r')
-            sys.stdout.write('PDF {}/{}, present: {}'.format(current_state, max_state, filename))
+            sys.stdout.write(f'{"PDF {}/{}, present: {}": <64}'.format(current_state, max_state, filename))
             sys.stdout.flush()
 
 
@@ -71,7 +71,7 @@ def main():
 
         with cf.ThreadPoolExecutor(max_workers=MAX_THREAD) as executor:
             pipe = [executor.submit(download, book[0], book[1], sherif) for book in csv_reader]
-            max_state = len(pipe)
+            max_state = len(pipe) - 1
             cf.wait(pipe)
 
 
