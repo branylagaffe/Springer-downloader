@@ -7,7 +7,7 @@ import threading
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 SPRINGER_FILE = os.path.join(DIR, 'springer.csv')
-SPRINGER_FOLDER = os.path.join(DIR, 'Bookstore_test')
+SPRINGER_FOLDER = os.path.join(DIR, 'Bookstore')
 SPRINGER_DOWLOAD = "https://link.springer.com/content/pdf"
 MAX_THREAD = 4
 
