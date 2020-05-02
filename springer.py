@@ -18,7 +18,7 @@ max_state = 0
 stale = 0
 
 
-def download(filename, url, sherif):
+def download(filename, url, sheriff):
     global current_state
     global stale
 
@@ -44,7 +44,7 @@ def download(filename, url, sherif):
 
             # Locking the thread because...
             # YEAH, we like concurrent programming
-            with sherif:
+            with sheriff:
                 # Update PDF counter
                 current_state += 1
                 sys.stdout.write('\r')
@@ -56,7 +56,7 @@ def download(filename, url, sherif):
             current_state += 1
 
     else:
-        with sherif:
+        with sheriff:
             # Update PDF counter
             current_state += 1
             sys.stdout.write('\r')
@@ -68,8 +68,8 @@ def main():
     global max_state
 
     # My brother made me do this, I think this is just plain boring,
-    # and I like to manage thread like the Sherif I would be in the Wild Wild West
-    sherif = threading.Lock()
+    # and I like to manage thread like the Sheriff I would be in the Wild Wild West
+    sheriff = threading.Lock()
 
     # Create directory
     if not os.path.exists(SPRINGER_FOLDER):
@@ -83,7 +83,7 @@ def main():
 
 		# Will take care of having constenly 4 thread running to download the PDFs
         with cf.ThreadPoolExecutor(max_workers=MAX_THREAD) as executor:
-            pipe = [executor.submit(download, book[0], book[1], sherif) for book in csv_reader]
+            pipe = [executor.submit(download, book[0], book[1], sheriff) for book in csv_reader]
             max_state = len(pipe) - 1
             cf.wait(pipe)
 
