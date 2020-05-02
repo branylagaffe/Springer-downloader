@@ -35,7 +35,7 @@ def download(filename, url, sheriff):
         # Open PDF link
         pdf = requests.get(download_url, stream=True)
 
-		# If it's not a PDF, it's seen as STALE
+        # If it's not a PDF, it's seen as STALE
         if pdf.headers['content-type'] in ['application/pdf']:
             # Create the new file and put the contents in it
             new_book = open(file_path, "wb")
@@ -51,7 +51,7 @@ def download(filename, url, sheriff):
                 sys.stdout.write(f'{"PDF {}/{}, downloaded: {}": <64}'.format(current_state, max_state, filename))
                 sys.stdout.flush()
         else:
-        	# Update PDF and STALE counter
+            # Update PDF and STALE counter
             stale += 1
             current_state += 1
 
@@ -75,19 +75,19 @@ def main():
     if not os.path.exists(SPRINGER_FOLDER):
         os.mkdir(SPRINGER_FOLDER)
 
-	# Open .csv
+    # Open .csv
     with open(SPRINGER_FILE) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         # Skip header
         next(csv_reader, None)
 
-		# Will take care of having constenly 4 thread running to download the PDFs
+        # Will take care of having constenly 4 thread running to download the PDFs
         with cf.ThreadPoolExecutor(max_workers=MAX_THREAD) as executor:
             pipe = [executor.submit(download, book[0], book[1], sheriff) for book in csv_reader]
             max_state = len(pipe) - 1
             cf.wait(pipe)
 
-	# End script and print stats
+    # End script and print stats
     print('\nDownloaded {}, found {} stale link'.format(max_state - stale, stale))
 
 
